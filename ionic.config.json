@@ -1,5 +1,7 @@
 {
   "name": "sample-paypal-payment-integration",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }
