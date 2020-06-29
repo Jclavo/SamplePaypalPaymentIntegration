@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { PayPal, PayPalPayment, PayPalConfiguration } from '@ionic-native/paypal/ngx';
 
+//Env
+import { environment } from "../../environments/environment";
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -9,16 +12,17 @@ import { PayPal, PayPalPayment, PayPalConfiguration } from '@ionic-native/paypal
 export class HomePage {
 
   public paymentAmount: string = '3.33';
-  public currency: string = 'USD';
-  public currencyIcon: string = '$';
+  public currency: string = 'BRL';
+  // public currencyIcon: string = '$';
 
   constructor(private payPal: PayPal) {}
 
   payWithPaypal(){
 
+    console.log(environment.PayPalEnvironmentSandbox);
     this.payPal.init({
-      PayPalEnvironmentProduction: 'YOUR_PRODUCTION_CLIENT_ID',
-      PayPalEnvironmentSandbox: 'YOUR_SANDBOX_CLIENT_ID'
+      PayPalEnvironmentProduction:  environment.PayPalEnvironmentProduction,
+      PayPalEnvironmentSandbox: environment.PayPalEnvironmentSandbox
     }).then(() => {
       // Environments: PayPalEnvironmentNoNetwork, PayPalEnvironmentSandbox, PayPalEnvironmentProduction
       this.payPal.prepareToRender('PayPalEnvironmentSandbox', new PayPalConfiguration({
@@ -27,7 +31,9 @@ export class HomePage {
       })).then(() => {
         // let payment = new PayPalPayment('3.33', 'USD', 'Description', 'sale');
         let payment = new PayPalPayment(this.paymentAmount, this.currency, 'Description', 'sale');
-        this.payPal.renderSinglePaymentUI(payment).then(() => {
+        this.payPal.renderSinglePaymentUI(payment).then((res) => {
+          console.log(res);
+         alert(res);
           // Successfully paid
     
           // Example sandbox response
@@ -47,13 +53,16 @@ export class HomePage {
           //     "intent": "sale"
           //   }
           // }
-        }, () => {
+        }, (error) => {
+          console.log('Error or render dialog closed without being successful', error)
           // Error or render dialog closed without being successful
         });
-      }, () => {
+      }, (error) => {
+        console.log('Error in configuration', error)
         // Error in configuration
       });
-    }, () => {
+    }, (error) => {
+      console.log('Error in initialization, maybe PayPal is not supported or something else.', error)
       // Error in initialization, maybe PayPal isn't supported or something else
     });
 
